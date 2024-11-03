@@ -1,5 +1,7 @@
-from settings import *
+import pygame as pg
 import math
+import time
+from settings import *
 
 class Player(pg.sprite.Sprite):
     def __init__(self, app, name='car'):
@@ -24,6 +26,9 @@ class Player(pg.sprite.Sprite):
         self.viewing_angle = app.cache.viewing_angle
         self.rotated_sprites = self.cache[name]['rotated_sprites']
 
+        self.last_update_time = time.time()  # Track the last update time
+        self.update_interval = 0.1  # Update every 100 ms
+
     def control(self):
         self.inc = vec2(0)
         speed = PLAYER_SPEED * self.app.delta_time
@@ -35,7 +40,7 @@ class Player(pg.sprite.Sprite):
             self.angle += rot_speed
         if key_state[pg.K_RIGHT]:
             self.angle += -rot_speed
-    
+
         if key_state[pg.K_w]:
             self.inc.x += speed * math.sin(self.angle * 2)
             self.inc.y += speed * math.cos(self.angle * 2)
@@ -57,19 +62,24 @@ class Player(pg.sprite.Sprite):
             self.inc = -self.prev_inc
 
     def update(self):
-       self.control()
-       self.check_collision()
-       self.get_image()
-       self.move() 
+        self.control()
+        self.check_collision()
+        self.get_image()
+        self.move()
+
+        current_time = time.time()
+        if current_time - self.last_update_time >= self.update_interval:
+            player_name = 'Player1'
+            new_position = {"x": self.offset[0], "y": self.offset[1]}
+            self.app.server.update_player_position(player_name, new_position)
+            self.last_update_time = current_time  # Reset the last update time
 
     def move(self):
         self.offset += self.inc
 
     def get_image(self):
-
         frame = math.degrees(self.angle) % 360
         frame = int(frame / (360 / NUM_ANGLES))
 
         self.image = self.rotated_sprites[frame]
-        
         self.rect = self.image.get_rect(center=self.rect.center)
