@@ -1,5 +1,6 @@
 import sys
 from settings import *
+from network import *
 from cache import Cache
 from player import Player
 from scene import Scene
@@ -20,6 +21,16 @@ class App:
         self.player = Player(self)
         self.scene = Scene(self)
 
+        # network
+        self.network = Network()
+
+    def readPos(position: str):
+        position = position.split(",")
+        return int(position[0]), int(position[1]) 
+    
+    def makePos(posTuple: tuple):
+        return str(posTuple[0]) + "," + str(posTuple[1])
+
     def update(self):
         self.scene.update()
         self.main_group.update()
@@ -32,6 +43,7 @@ class App:
         pg.display.flip()
 
     def check_events(self):
+        pg.event.set_allowed([pg.QUIT, pg.K_w, pg.K_s, pg.K_ESCAPE])
         self.anim_trigger = False
         for e in pg.event.get():
             if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):

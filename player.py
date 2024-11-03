@@ -47,8 +47,6 @@ class Player(pg.sprite.Sprite):
         if self.inc.x and self.inc.y:
             self.inc *= self.diag_move_corr
 
-        print(self.angle)
-
     def check_collision(self):
         hit = pg.sprite.spritecollide(self, self.app.collision_group,
                                       dokill=False, collided=pg.sprite.collide_mask)
