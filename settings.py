@@ -17,31 +17,17 @@ ENTITY_SPRITE_ATTRS = {
 }
 
 STACKED_SPRITE_ATTRS = {
-    # ~ 'sphere': {
-        # ~ 'path': 'assets/stacked_sprites/sphere.png',
-        # ~ 'num_layers': 13,
-        # ~ 'scale': 10,
-        # ~ 'y_offset': 0,
-        # ~ 'mask_layer': 4,
-    # ~ },
-    # ~ 'pancake': {
-        # ~ 'path': 'assets/stacked_sprites/pancake.png',
-        # ~ 'num_layers': 11,
-        # ~ 'scale': 7,
-        # ~ 'y_offset': 0,
-        # ~ 'mask_layer': 4,
-    # ~ },
-    # ~ 'cup': {
-        # ~ 'path': 'assets/stacked_sprites/cup.png',
-        # ~ 'num_layers': 13,
-        # ~ 'scale': 8,
-        # ~ 'y_offset': 10,
-    # ~ },
     'crate': {
         'path': 'assets/stacked_sprites/crate.png',
         'num_layers': 16,
         'scale': 5,
         'y_offset': 10,
+    },
+    'wheel': {
+        'path': 'assets/stacked_sprites/wheel.png',
+        'num_layers': 4,
+        'scale': 5,
+        'y_offset': 0,
     },
     'grass': {
         'path': 'assets/stacked_sprites/grass.png',
@@ -50,14 +36,6 @@ STACKED_SPRITE_ATTRS = {
         'y_offset': 20,
         'outline': False,
     },
-    # ~ 'blue_tree': {
-        # ~ 'path': 'assets/stacked_sprites/blue_tree.png',
-        # ~ 'num_layers': 43,
-        # ~ 'scale': 8,
-        # ~ 'y_offset': -130,
-        # ~ 'transparency': True,
-        # ~ 'mask_layer': 3,
-    # ~ },
     'car': {
         'path': 'assets/stacked_sprites/car.png',
         'num_layers': 9,

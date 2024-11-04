@@ -1,5 +1,6 @@
 import sys
 import pygame as pg
+import threading
 from settings import *
 from server import Server
 from cache import Cache
@@ -8,12 +9,16 @@ from scene import Scene
 
 class App:
     def __init__(self):
-        pg.init()  # Initialize Pygame
+        pg.init()
         self.screen = pg.display.set_mode(RES)
         self.clock = pg.time.Clock()
         self.time = 0
         self.delta_time = 0.01
         
+        # Time interval for updating other players (in milliseconds)
+        self.update_interval = 10  # Update every 1000 ms (1 second)
+        self.last_update_time = pg.time.get_ticks()  # Initialize last update time
+
         # Groups
         self.main_group = pg.sprite.LayeredUpdates()
         self.collision_group = pg.sprite.Group()
@@ -25,13 +30,20 @@ class App:
         self.scene = Scene(self)
 
         # Network
-        self.server = Server()
-        remote_file_path = "python_game_data/player_positions.json"
-        self.server.start_updating(remote_file_path)
+        self.server = Server(self)
+        self.server.connect_to_server()
+        self.server.create_player_file()
 
     def update(self):
         self.scene.update()
         self.main_group.update()
+
+        # Check if it's time to update other players
+        current_time = pg.time.get_ticks()
+        if current_time - self.last_update_time >= self.update_interval:
+            self.server.load_other_players()  # Load other players
+            self.last_update_time = current_time  # Reset last update time
+
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
         self.delta_time = self.clock.tick()
 
@@ -45,9 +57,7 @@ class App:
         self.anim_trigger = False
         for e in pg.event.get():
             if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
-                remote_file_path = "python_game_data/player_positions.json"  # Path to the remote file
-                self.server.delete_player(remote_file_path)  # Delete the player before quitting
-                self.server.stop_updating()  # Stop updating before quitting
+                self.server.disconnect_from_server()
                 pg.quit()
                 sys.exit()
 

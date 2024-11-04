@@ -25,9 +25,11 @@ class Player(pg.sprite.Sprite):
         self.cache = app.cache.stacked_sprite_cache
         self.viewing_angle = app.cache.viewing_angle
         self.rotated_sprites = self.cache[name]['rotated_sprites']
+        
+        self.name = ""
 
-        self.last_update_time = time.time()  # Track the last update time
-        self.update_interval = 0.1  # Update every 100 ms
+    def set_name(self, name: str):
+        self.name = name
 
     def control(self):
         self.inc = vec2(0)
@@ -66,13 +68,7 @@ class Player(pg.sprite.Sprite):
         self.check_collision()
         self.get_image()
         self.move()
-
-        current_time = time.time()
-        if current_time - self.last_update_time >= self.update_interval:
-            player_name = 'Player1'
-            new_position = {"x": self.offset[0], "y": self.offset[1]}
-            self.app.server.update_player_position(player_name, new_position)
-            self.last_update_time = current_time  # Reset the last update time
+        self.app.server.update_pos(self.offset)
 
     def move(self):
         self.offset += self.inc

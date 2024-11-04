@@ -27,6 +27,7 @@ class StackedSprite(pg.sprite.Sprite):
         self.image = self.rotated_sprites[self.angle]
         self.mask = self.collision_masks[self.angle]
         self.rect = self.image.get_rect()
+        self.file_path = None
 
     def change_layer(self):
         self.group.change_layer(self, self.screen_pos.y)

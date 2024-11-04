@@ -1,102 +1,114 @@
 import paramiko
-import json
-import threading
-import time
+import re
+from stacked_sprite import vec2, StackedSprite
 
 class Server:
-    def __init__(self):
+    def __init__(self, app):
         self.hostname = '161.246.5.62'
         self.username = 'u66011215'
         self.password = 'Papika528'
-        self.player_data = {}
-        self.update_interval = 0.1 
-        self.stop_thread = False 
-        self.ssh = None  
-        self.thread = None 
-        self.player_name = "Player1"
+        self.ssh = None
+        self.sftp = None
+        self.app = app
+        self.player_name = None
+        self.remote_directory = "room1"
+        self.other_players_sprites = []
 
     def connect_to_server(self):
-        """Establish an SSH connection to the server."""
         try:
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh.connect(self.hostname, username=self.username, password=self.password)
-            self.ssh = ssh  # Save the connection
-            print("Connected to the server.")
+            self.ssh = ssh
+            self.sftp = ssh.open_sftp()  # Open SFTP session
+            print("server connected")
         except Exception as e:
-            print(f"Error connecting to server: {e}")
+            print(f"error connect server: {e}")
 
-    def update_player_position(self, player_name, new_position):
-        """Update the player's position in memory and on the server."""
-        if player_name in self.player_data:
-            self.player_data[player_name]['position'] = new_position
-            print(f"Updated position for {player_name} to {new_position}.")
-        else:
-            print(f"Player {player_name} not found. Creating a new player.")
-            self.player_data[player_name] = {'position': new_position}  # Create new entry if not found
-            print(f"Created a new entry for {player_name}.")
-
-    def read_file(self, remote_file_path):
-        """Read player data from the remote file and create a player if not found."""
+    def create_player_file(self):
         try:
-            sftp = self.ssh.open_sftp()
-            with sftp.file(remote_file_path, 'r') as file:
-                data = file.read()
-                self.player_data = json.loads(data.decode('utf-8'))  # Store data in memory
+            files = self.sftp.listdir(self.remote_directory)
+            
+            numbers = [
+                int(re.match(r"(\d+)\.txt", file).group(1))
+                for file in files
+                if re.match(r"(\d+)\.txt", file)
+            ]
 
-            # Check if the player exists in the loaded data
-            if self.player_name not in self.player_data:
-                print(f"Player {self.player_name} not found in the data. Creating a new player.")
-                self.player_data[self.player_name] = {'position': {'x': 0, 'y': 0}}  # Create a new player entry
-                self.write_file(remote_file_path)  # Write the new player to the file
-            else:
-                print("Player data read successfully.")
+            next_number = max(numbers) + 1 if numbers else 1
+            new_file_path = f"{self.remote_directory}/{next_number}.txt"
+            
+            with self.sftp.file(new_file_path, 'w') as remote_file:
+                remote_file.write("")
+                print(f"created file {new_file_path}")
+            self.player_name = new_file_path
+
         except Exception as e:
-            print(f"Error reading file: {e}")
-        finally:
-            sftp.close()
+            print(f"error create file: {e}")
 
-    def write_file(self, remote_file_path):
-        """Write player data to the remote file."""
+    def update_pos(self, pos: vec2):
         try:
-            with self.ssh.open_sftp() as sftp:
-                with sftp.file(remote_file_path, 'w') as file:
-                    file.write(json.dumps(self.player_data))  # Write all data at once
-                    print(f"File {remote_file_path} updated successfully.")
+            if not self.player_name:
+                print("player name not found")
+                return
+            
+            with self.sftp.file(self.player_name, 'w') as f:
+                f.write(f"{pos.x:.2},{pos.y:.2}")
+                print(f"Updated position for {self.player_name} to ({pos.x}, {pos.y})")
+                
         except Exception as e:
-            print(f"Error writing file: {e}")
+            print(f"Error updating position: {e}")
 
-    def delete_player(self, remote_file_path):
-        """Remove the player from the JSON file."""
-        if self.player_name in self.player_data:
-            del self.player_data[self.player_name]  # Remove the player from memory
-            self.write_file(remote_file_path)  # Update the remote file
-            print(f"Deleted player {self.player_name} from the server.")
+    def load_other_players(self):
+        """Load or update other players' positions from their files and instantiate or update their sprites."""
+        try:
+            files = self.sftp.listdir(self.remote_directory)
 
-    def start_updating(self, remote_file_path):
-        """Start a thread to periodically update the player positions."""
-        if self.ssh is None:
-            self.connect_to_server()  # Ensure connection is established
-        self.read_file(remote_file_path)  # Initial read
-        
-        self.stop_thread = False  # Reset the stop flag
+            for file in files:
+                file_path = f"{self.remote_directory}/{file}"
+                
+                # Skip the player's own file
+                if file_path == self.player_name:
+                    continue
+                
+                # Read position data for each other player
+                with self.sftp.file(file_path, 'r') as f:
+                    content = f.read().decode('utf-8').strip()
+                    if content:
+                        x, y = map(float, content.split(","))
+                        pos = vec2(x, y)
+                        
+                        # Check if this player already has a sprite
+                        existing_sprite = next((sprite for sprite in self.other_players_sprites if sprite.file_path == file_path), None)
+                        
+                        if existing_sprite:
+                            # Update position if sprite already exists
+                            existing_sprite.pos = pos
+                            print(f"Updated other player sprite from {file_path} to new position ({x}, {y})")
+                        else:
+                            # Create a new sprite if it doesn't exist
+                            sprite = StackedSprite(self.app, name='car', pos=pos)
+                            sprite.file_path = file_path  # Add file path for easier identification
+                            self.other_players_sprites.append(sprite)
+                            print(f"Loaded new other player sprite from {file_path} at position ({x}, {y})")
 
-        # Define the thread target function
-        def update_loop():
-            while not self.stop_thread:
-                self.write_file(remote_file_path)  # Write data periodically
-                time.sleep(self.update_interval)  # Control update frequency
-        
-        self.thread = threading.Thread(target=update_loop)
-        self.thread.start()  # Start the updating thread
-        print("Started updating thread.")
+        except Exception as e:
+            print(f"Error loading or updating other players: {e}")
 
-    def stop_updating(self):
-        """Stop the updating thread."""
-        self.stop_thread = True
-        if self.thread is not None:
-            self.thread.join()  # Wait for the thread to finish
-            print("Updating thread stopped.")
+    def delete_player_file(self):
+        """Delete the player's file from the server."""
+        try:
+            if self.player_name:
+                self.sftp.remove(self.player_name)
+                print(f"Deleted player file: {self.player_name}")
+        except Exception as e:
+            print(f"Error deleting player file: {e}")
+
+    def disconnect_from_server(self):
+        """Close SFTP and SSH connection."""
+        self.delete_player_file()
+        if self.sftp:
+            self.sftp.close()
         if self.ssh:
-            self.ssh.close()  # Close the SSH connection
-            print("SSH connection closed.")
+            self.ssh.close()
+        print("Disconnected from the server.")
