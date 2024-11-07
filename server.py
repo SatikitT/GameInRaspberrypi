@@ -134,14 +134,14 @@ class Server:
         except Exception as e:
             print(f"Error connecting to server: {e}")
 
-    def update_pos(self, pos: vec2):
+    def update_pos(self, pos: vec2, angle: float):
         """Send player's position data to the server."""
         try:
             if not self.client_socket:
                 print("Not connected to server")
                 return
             # Send serialized position data as a tuple (player name, x, y)
-            data = (self.player_name, int(pos.x), int(pos.y))
+            data = (self.player_name, pos.x, pos.y, angle)
             self.client_socket.sendall(pickle.dumps(data))
             print(f"Sent position for {self.player_name}: ({pos.x}, {pos.y})")
         except Exception as e:
@@ -156,14 +156,14 @@ class Server:
                 # Deserialize the data
                 players_data = pickle.loads(data)
     
-                print(players_data)
-                for _, (player_name, x, y) in players_data.items():
+                for _, (player_name, x, y, angle) in players_data.items():
                     pos = vec2(x, y)
                     if (player_name != self.player_name):
                         # Find or create sprite for the player
                         existing_sprite = next((sprite for sprite in self.other_players_sprites if sprite.name == player_name), None)
                         if existing_sprite:
                             existing_sprite.pos = pos
+                            existing_sprite.angle = angle
                         else:
                             # Create a new sprite if not found
                             sprite = StackedSprite(self.app, name='car', pos=pos)
