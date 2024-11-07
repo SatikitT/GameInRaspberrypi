@@ -16,7 +16,6 @@ class Menu:
             x = x - img.get_width() // 2 
         self.app.screen.blit(img, (x, y))
 
-
     def run(self):
 
         resume = Button("Start", WIDTH/2, 400)

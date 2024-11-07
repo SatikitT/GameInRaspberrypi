@@ -33,17 +33,17 @@ class App:
         # Network
         self.server = Server(self)
         self.server.connect_to_server()
-        self.server.create_player_file()
+        # self.server.create_player_file()
 
     def update(self):
         self.scene.update()
         self.main_group.update()
 
         # Check if it's time to update other players
-        current_time = pg.time.get_ticks()
-        if current_time - self.last_update_time >= self.update_interval:
-            self.server.load_other_players()  # Load other players
-            self.last_update_time = current_time  # Reset last update time
+        # current_time = pg.time.get_ticks()
+        # if current_time - self.last_update_time >= self.update_interval:
+        self.server.load_other_players()  # Load other players
+        #     self.last_update_time = current_time  # Reset last update time
 
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
         self.delta_time = self.clock.tick()
