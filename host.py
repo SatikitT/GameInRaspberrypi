@@ -18,12 +18,8 @@ def handle_client(conn, player_id):
     with conn:
         print(f"Player {player_id} connected.")
         with lock:
-<<<<<<< Updated upstream
-            players[player_id] = (100, 100)  # Initial position
-=======
             # Initialize player with default position and angle (e.g., 100, 100, 0 degrees)
             players[player_id] = ('player_' + player_id, 100, 100, 0)  # (player_name, x, y, angle)
->>>>>>> Stashed changes
             connections.append(conn)
 
         try:
