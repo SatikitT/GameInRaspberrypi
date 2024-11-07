@@ -7,7 +7,7 @@ import uuid  # For unique player IDs
 HOST = '0.0.0.0'  # Listen on all available interfaces
 PORT = 5555
 
-# Dictionary to hold player positions
+# Dictionary to hold player positions and angles
 players = {}
 connections = []  # List to hold client connections for broadcasting
 
@@ -18,7 +18,12 @@ def handle_client(conn, player_id):
     with conn:
         print(f"Player {player_id} connected.")
         with lock:
+<<<<<<< Updated upstream
             players[player_id] = (100, 100)  # Initial position
+=======
+            # Initialize player with default position and angle (e.g., 100, 100, 0 degrees)
+            players[player_id] = ('player_' + player_id, 100, 100, 0)  # (player_name, x, y, angle)
+>>>>>>> Stashed changes
             connections.append(conn)
 
         try:
@@ -30,19 +35,19 @@ def handle_client(conn, player_id):
 
                 try:
                     # Deserialize position update from client
-                    pos = pickle.loads(data)
+                    player_data = pickle.loads(data)  # This now includes (name, x, y, angle)
+                    player_name, x, y, angle = player_data
                 except pickle.PickleError:
                     print(f"Received corrupt data from {player_id}.")
                     break
 
-                # Update the player's position
+                # Update the player's position and angle in the server
                 with lock:
-                    players[player_id] = pos
+                    players[player_id] = (player_name, x, y, angle)
 
-                    # Prepare and send the updated positions to all clients
+                    # Prepare and send the updated positions and angles to all clients
                     player_data = pickle.dumps(players)
 
-                    print(player_data)
                     # Broadcast to all clients
                     for client_conn in connections:
                         try:
