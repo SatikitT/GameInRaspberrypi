@@ -4,14 +4,14 @@ from stacked_sprite import vec2, StackedSprite
 
 class Server:
     def __init__(self, app):
-        self.hostname = '161.246.5.62'
-        self.username = 'u66011215'
-        self.password = 'Papika528'
+        self.hostname = '192.168.1.167'
+        self.username = 'user'
+        self.password = 'password'
         self.ssh = None
         self.sftp = None
         self.app = app
         self.player_name = None
-        self.remote_directory = "room1"
+        self.remote_directory = "test"
         self.other_players_sprites = []
 
     def connect_to_server(self):
@@ -53,7 +53,7 @@ class Server:
                 return
             
             with self.sftp.file(self.player_name, 'w') as f:
-                f.write(f"{pos.x:.2},{pos.y:.2}")
+                f.write(f"{int(pos.x)},{int(pos.y)}")
                 print(f"Updated position for {self.player_name} to ({pos.x}, {pos.y})")
                 
         except Exception as e:

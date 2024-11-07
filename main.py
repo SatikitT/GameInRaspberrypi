@@ -1,11 +1,11 @@
 import sys
-import pygame as pg
 import threading
 from settings import *
 from server import Server
 from cache import Cache
 from player import Player
 from scene import Scene
+from menu import Menu
 
 class App:
     def __init__(self):
@@ -16,7 +16,7 @@ class App:
         self.delta_time = 0.01
         
         # Time interval for updating other players (in milliseconds)
-        self.update_interval = 10  # Update every 1000 ms (1 second)
+        self.update_interval = 100  # Update every 1000 ms (1 second)
         self.last_update_time = pg.time.get_ticks()  # Initialize last update time
 
         # Groups
@@ -28,6 +28,7 @@ class App:
         self.cache = Cache()
         self.player = Player(self)
         self.scene = Scene(self)
+        self.menu = Menu(self)
 
         # Network
         self.server = Server(self)
@@ -50,6 +51,7 @@ class App:
     def draw(self):
         self.screen.fill(BG_COLOR)
         self.main_group.draw(self.screen)
+
         pg.display.flip()
 
     def check_events(self):
@@ -66,10 +68,12 @@ class App:
 
     def run(self):
         while True:
-            self.check_events()
-            self.get_time()
-            self.update()
-            self.draw()
+            self.menu.run()
+            while True:
+                self.check_events()
+                self.get_time()
+                self.update()
+                self.draw()
 
 if __name__ == '__main__':
     app = App()

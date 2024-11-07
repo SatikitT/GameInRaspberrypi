@@ -18,7 +18,7 @@ class Player(pg.sprite.Sprite):
         self.offset = vec2(0)
         self.inc = vec2(0)
         self.prev_inc = vec2(0)
-        self.angle = 0
+        self.angle = 3.14/2
         self.diag_move_corr = 1 / math.sqrt(2)
 
         self.attrs = STACKED_SPRITE_ATTRS[name]
