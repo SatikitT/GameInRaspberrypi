@@ -54,7 +54,7 @@ class Server:
             
             with self.sftp.file(self.player_name, 'w') as f:
                 f.write(f"{int(pos.x)},{int(pos.y)}")
-                print(f"Updated position for {self.player_name} to ({pos.x}, {pos.y})")
+                #print(f"Updated position for {self.player_name} to ({pos.x}, {pos.y})")
                 
         except Exception as e:
             print(f"Error updating position: {e}")
@@ -75,8 +75,8 @@ class Server:
                 with self.sftp.file(file_path, 'r') as f:
                     content = f.read().decode('utf-8').strip()
                     if content:
-                        x, y = map(float, content.split(","))
-                        pos = vec2(x, y)
+                        x, y = content.split(",")
+                        pos = vec2(int(x), int(y))
                         
                         # Check if this player already has a sprite
                         existing_sprite = next((sprite for sprite in self.other_players_sprites if sprite.file_path == file_path), None)
