@@ -163,7 +163,7 @@ class Server:
                         existing_sprite = next((sprite for sprite in self.other_players_sprites if sprite.name == player_name), None)
                         if existing_sprite:
                             existing_sprite.pos = pos
-                            existing_sprite.angle = angle
+                            existing_sprite.rot = angle * 23
                         else:
                             # Create a new sprite if not found
                             sprite = StackedSprite(self.app, name='car', pos=pos)

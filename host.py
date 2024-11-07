@@ -18,7 +18,7 @@ def handle_client(conn, player_id):
     with conn:
         print(f"Player {player_id} connected.")
         with lock:
-            players[player_id] = (100, 100, 0)  # Initial position
+            players[player_id] = (100, 100)  # Initial position
             connections.append(conn)
 
         try:
