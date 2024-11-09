@@ -6,6 +6,7 @@ P = 'player'
 C = 'car'
 F = 'crate'
 W = 'wheel'
+L = 'finishline'
 
 MAP = [
     [W, W, W, W, W, W, W, W, W, W, W, W, W, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -14,8 +15,8 @@ MAP = [
     [W, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, W, 0, 0, 0, W, W, W, W, 0, 0, 0, 0, 0],
     [W, 0, 0, 0, 0, W, W, W, W, 0, 0, 0, 0, W, 0, 0, W, 0, 0, 0, 0, W, W, W, 0, 0],
     [W, 0, 0, 0, W, 0, 0, 0, W, W, 0, 0, 0, W, 0, 0, W, 0, 0, 0, 0, 0, 0, 0, W, 0],
-    [W, 0, P, 0, W, 0, 0, 0, 0, W, 0, 0, 0, W, 0, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, W],
-    [W, 0, 0, 0, 0, W, 0, 0, 0, W, 0, 0, 0, W, W, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, W],
+    [W, L, L, L, W, 0, 0, 0, 0, W, 0, 0, 0, W, 0, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, W],
+    [W, 0, P, 0, 0, W, 0, 0, 0, W, 0, 0, 0, W, W, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, W],
     [W, 0, 0, 0, 0, 0, W, 0, 0, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, W, W, 0, 0, 0, 0, W],
     [W, 0, 0, 0, 0, 0, W, 0, 0, W, 0, 0, 0, 0, 0, 0, 0, 0, 0, W, 0, 0, 0, 0, 0, W],
     [W, W, 0, 0, 0, 0, W, 0, 0, W, 0, 0, 0, 0, 0, 0, 0, 0, W, 0, 0, 0, 0, 0, 0, W],
@@ -47,6 +48,9 @@ class Scene:
                 pos = vec2(i, j) + vec2(0.5)
                 if name == 'player':
                     self.app.player.offset = pos * TILE_SIZE
+                elif name == 'finishline':
+                    StackedSprite(self.app, name=name, pos=pos, rot=0,
+                                  collision=False)
                 elif name:
                     StackedSprite(self.app, name=name, pos=rand_pos(pos))
 
@@ -62,9 +66,7 @@ class Scene:
 #     Entity(self.app, name=name, pos=pos)
 # elif name == 'blue_tree':
 #     TrnspStackedSprite(self.app, name=name, pos=rand_pos(pos), rot=rand_rot())
-# elif name == 'grass':
-#     StackedSprite(self.app, name=name, pos=rand_pos(pos), rot=rand_rot(),
-#                   collision=False)
+
 # elif name == 'sphere':
 #     obj = StackedSprite(self.app, name=name, pos=rand_pos(pos), rot=rand_rot())
 #     self.transform_objects.append(obj)

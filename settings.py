@@ -27,7 +27,7 @@ STACKED_SPRITE_ATTRS = {
         'path': 'assets/stacked_sprites/wheel.png',
         'num_layers': 4,
         'scale': 5,
-        'y_offset': 0,
+        'y_offset': 0
     },
     'grass': {
         'path': 'assets/stacked_sprites/grass.png',
@@ -36,11 +36,18 @@ STACKED_SPRITE_ATTRS = {
         'y_offset': 20,
         'outline': False,
     },
+    'finishline': {
+        'path': 'assets/stacked_sprites/finishline.png',
+        'num_layers': 1,
+        'scale': 7,
+        'y_offset': 0,
+        'outline': False,
+    },
     'car': {
         'path': 'assets/stacked_sprites/car.png',
         'num_layers': 9,
         'scale': 5,
-        'y_offset': 5,
+        'y_offset': 0,
     },
     'van': {
         'path': 'assets/stacked_sprites/van.png',

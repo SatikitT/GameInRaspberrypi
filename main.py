@@ -14,6 +14,8 @@ class App:
         self.clock = pg.time.Clock()
         self.time = 0
         self.delta_time = 0.01
+        self.maximum_lap = 3
+        self.game_state = 'menu'
         
         # Time interval for updating other players (in milliseconds)
         self.update_interval = 100  # Update every 1000 ms (1 second)
@@ -22,6 +24,7 @@ class App:
         # Groups
         self.main_group = pg.sprite.LayeredUpdates()
         self.collision_group = pg.sprite.Group()
+        self.finishline_group = pg.sprite.Group()
         self.transparent_objects = []
         
         # Game objects
@@ -32,18 +35,20 @@ class App:
 
         # Network
         self.server = Server(self)
-        self.server.connect_to_server()
-        self.server.create_player_file()
 
     def update(self):
         self.scene.update()
         self.main_group.update()
 
-        # Check if it's time to update other players
         current_time = pg.time.get_ticks()
         if current_time - self.last_update_time >= self.update_interval:
-            self.server.load_other_players()  # Load other players
-            self.last_update_time = current_time  # Reset last update time
+            self.server.update_pos(self.player.offset, self.player.angle)
+            self.server.load_other_players()
+            self.last_update_time = current_time 
+
+        if self.player.lap >= self.maximum_lap:
+            self.server.send_win_notification()
+            self.game_state = 'menu'
 
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
         self.delta_time = self.clock.tick()
@@ -60,20 +65,27 @@ class App:
         for e in pg.event.get():
             if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
                 self.server.disconnect_from_server()
-                pg.quit()
-                sys.exit()
+                self.game_state = 'menu'
+                
 
     def get_time(self):
         self.time = pg.time.get_ticks() * 0.001
 
     def run(self):
         while True:
-            self.menu.run()
-            while True:
-                self.check_events()
-                self.get_time()
-                self.update()
-                self.draw()
+            match (self.game_state):
+                case 'menu':
+                    self.menu.run()
+                    self.player.lap = -1
+                case 'start':
+                    self.check_events()
+                    self.get_time()
+                    self.update()
+                    self.draw()
+                case _:
+                    pg.quit()
+                    sys.exit()
+                    break
 
 if __name__ == '__main__':
     app = App()
