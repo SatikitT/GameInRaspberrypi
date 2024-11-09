@@ -72,7 +72,6 @@ class Player(pg.sprite.Sprite):
         self.check_collision()
         self.get_image()
         self.move()
-        self.app.server.update_pos(self.offset, self.angle)
 
     def move(self):
         self.offset += self.inc

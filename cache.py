@@ -53,7 +53,7 @@ class Cache:
             surf = pg.Surface(layer_array[0].get_size())
             surf = pg.transform.rotate(surf, angle * self.viewing_angle)
             sprite_surf = pg.Surface([surf.get_width(), surf.get_height()
-                                      + attrs['num_layers'] * attrs['scale'] + 50])
+                                      + attrs['num_layers'] * attrs['scale'] + 100])
             sprite_surf.fill('khaki')
             sprite_surf.set_colorkey('khaki')
 
@@ -63,8 +63,8 @@ class Cache:
 
                 # get collision mask
                 if ind == mask_layer:
-                    surf = pg.transform.flip(sprite_surf, True, True)
-                    mask = pg.mask.from_surface(surf)
+                    #surf = pg.transform.flip(sprite_surf, True, True)
+                    mask = pg.mask.from_surface(sprite_surf)
                     self.stacked_sprite_cache[obj_name]['collision_masks'][angle] = mask
 
             # get outline

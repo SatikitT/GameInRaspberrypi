@@ -117,20 +117,29 @@ import socket
 import pickle
 from stacked_sprite import vec2, StackedSprite
 
+# self.hostname = '57.155.64.75'
+# self.port = 8080
+
 class Server:
     def __init__(self, app):
-        self.hostname = '192.168.1.167'
-        self.port = 5555
+        self.hostname = '57.155.64.75'
+        self.port = 8080
         self.client_socket = None
         self.app = app
-        self.player_name = f"player_{id(self)}"
+        self.player_name = None
         self.other_players_sprites = []
 
     def connect_to_server(self):
         try:
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect((self.hostname, self.port))
-            print("Server connected")
+            
+            # Receive the assigned player name from the server
+            data = self.client_socket.recv(4096)
+            print(pickle.loads(data))
+            self.player_name, self.app.player.offset.x, self.app.player.offset.y = pickle.loads(data)
+            
+            print(f"Connected to server as {self.player_name}")
         except Exception as e:
             print(f"Error connecting to server: {e}")
 
@@ -143,7 +152,7 @@ class Server:
             # Send serialized position data as a tuple (player name, x, y)
             data = (self.player_name, pos.x, pos.y, angle)
             self.client_socket.sendall(pickle.dumps(data))
-            print(f"Sent position for {self.player_name}: ({pos.x}, {pos.y})")
+            #print(f"Sent position for {self.player_name}: ({pos.x}, {pos.y})")
         except Exception as e:
             print(f"Error sending position data: {e}")
 
@@ -168,9 +177,10 @@ class Server:
                             # Create a new sprite if not found
                             sprite = StackedSprite(self.app, name='car', pos=pos)
                             sprite.name = player_name
+                            print(f"create {sprite.name}")
                             self.other_players_sprites.append(sprite)
 
-                print(f"Updated players: {players_data}")
+                #print(f"Updated players: {players_data}")
 
         except Exception as e:
             print(f"Error receiving other players' data: {e}")

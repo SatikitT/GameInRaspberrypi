@@ -31,6 +31,7 @@ class Menu:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if resume.check_for_input(mouse_pos):
                         self.start = True
+                        self.app.server.connect_to_server()
                 if event.type == pg.QUIT:
                     pg.quit()
 

@@ -5,7 +5,7 @@ import uuid  # For unique player IDs
 
 # Server configuration
 HOST = '0.0.0.0'  # Listen on all available interfaces
-PORT = 5555
+PORT = 8080
 
 # Dictionary to hold player positions and angles
 players = {}
