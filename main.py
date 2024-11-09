@@ -47,7 +47,6 @@ class App:
             self.last_update_time = current_time 
 
         if self.player.lap >= self.maximum_lap:
-            self.server.send_win_notification()
             self.game_state = 'menu'
 
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')

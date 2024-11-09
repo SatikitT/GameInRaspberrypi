@@ -46,6 +46,7 @@ class Player(pg.sprite.Sprite):
         
         self.name = ""
         self.mpu = None
+        self.setup_mpu()
 
     def setup_mpu(self):
         try:
