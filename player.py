@@ -9,6 +9,8 @@ class Player(pg.sprite.Sprite):
     def __init__(self, app, name='car'):
         self.app = app
         self.group = app.main_group
+        self.lap = -1
+        self.is_crossing = False
         super().__init__(self.group)
 
         self.group.change_layer(self, CENTER.y)
@@ -66,6 +68,16 @@ class Player(pg.sprite.Sprite):
                 self.prev_inc = self.inc
         else:
             self.inc = -self.prev_inc
+
+        hit = pg.sprite.spritecollide(self, self.app.finishline_group,
+                                      dokill=False, collided=pg.sprite.collide_mask)
+        if hit:
+            self.is_crossing = True
+
+        if self.is_crossing == True and not hit:
+            self.lap += 1
+            print(self.lap)
+            self.is_crossing = False
 
     def update(self):
         self.control()

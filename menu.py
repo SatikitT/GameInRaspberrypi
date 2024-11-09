@@ -9,6 +9,8 @@ class Menu:
         self.color = (255,255,255)
         self.start = False
 
+        self.resume = Button("Start", WIDTH/2, 400)
+
     def draw_text(self, text, x, y, size=40, font_fam="arialblack", text_col=(255, 255, 255), center_x=True):
         font = pg.font.SysFont(font_fam, size)
         img = font.render(text, True, text_col)
@@ -18,24 +20,21 @@ class Menu:
 
     def run(self):
 
-        resume = Button("Start", WIDTH/2, 400)
+        mouse_pos = pg.mouse.get_pos()
+        self.app.screen.fill((0,0,0))
 
-        while not self.start:
-            mouse_pos = pg.mouse.get_pos()
-            self.app.screen.fill((0,0,0))
+        self.draw_text("multiplayer racing game", WIDTH/2, 200)
+        self.resume.update(self.app.screen)
 
-            self.draw_text("multiplayer racing game", WIDTH/2, 200)
-            resume.update(self.app.screen)
+        for event in pg.event.get():
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if self.resume.check_for_input(mouse_pos):
+                    self.app.game_state = 'start'
+                    self.app.server.connect_to_server()
+            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
+                self.app.game_state = ''
 
-            for event in pg.event.get():
-                if event.type == pg.MOUSEBUTTONDOWN:
-                    if resume.check_for_input(mouse_pos):
-                        self.start = True
-                        self.app.server.connect_to_server()
-                if event.type == pg.QUIT:
-                    pg.quit()
-
-            pg.display.update()
+        pg.display.update()
 
 
 

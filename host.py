@@ -16,54 +16,52 @@ lock = threading.Lock()
 
 def handle_client(conn, player_id):
     with conn:
-        print(f"Player {player_id} connected.")
+        player_name = f"player_{player_id[:8]}"  # Unique player name based on UUID
+        print(f"{player_name} connected.")
+
+        # Send the player name to the client
+        conn.sendall(pickle.dumps((player_name, 175 + 100 * len(connections), 750)))
+
         with lock:
-            # Initialize player with default position and angle (e.g., 100, 100, 0 degrees)
-            players[player_id] = ('player_' + player_id, 100, 100, 0)  # (player_name, x, y, angle)
+            # Initialize player with default position and angle
+            players[player_id] = (player_name, 175 + 100 * len(connections), 750, 0)  # (player_name, x, y, angle)
             connections.append(conn)
 
         try:
             while True:
-                # Receive data from client
                 data = conn.recv(4096)
                 if not data:
                     break
 
                 try:
                     # Deserialize position update from client
-                    player_data = pickle.loads(data)  # This now includes (name, x, y, angle)
-                    player_name, x, y, angle = player_data
+                    player_data = pickle.loads(data)
+                    _, x, y, angle = player_data  # Ignore the client-sent name
                 except pickle.PickleError:
-                    print(f"Received corrupt data from {player_id}.")
+                    print(f"Received corrupt data from {player_name}.")
                     break
 
-                # Update the player's position and angle in the server
+                # Update the player's position and angle on the server
                 with lock:
                     players[player_id] = (player_name, x, y, angle)
 
-                    # Prepare and send the updated positions and angles to all clients
+                    # Broadcast updated player data to all clients
                     player_data = pickle.dumps(players)
-
-                    # Broadcast to all clients
                     for client_conn in connections:
                         try:
                             client_conn.sendall(player_data)
                         except (ConnectionResetError, ConnectionAbortedError):
-                            print(f"Error sending data to a client. Removing client.")
                             connections.remove(client_conn)
 
-        except (ConnectionResetError, ConnectionAbortedError):
-            print(f"Player {player_id} disconnected abruptly.")
-        except Exception as e:
-            print(f"An error occurred with player {player_id}: {e}")
         finally:
-            # Clean up the player on disconnection
+            # Clean up on disconnection
             with lock:
                 if player_id in players:
                     del players[player_id]
                 if conn in connections:
                     connections.remove(conn)
-            print(f"Player {player_id} removed.")
+            print(f"{player_name} removed.")
+
 
 def start_server():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:

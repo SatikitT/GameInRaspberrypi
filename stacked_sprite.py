@@ -12,6 +12,8 @@ class StackedSprite(pg.sprite.Sprite):
 
         if collision:
             self.app.collision_group.add(self)
+        elif self.name == 'finishline':
+            self.app.finishline_group.add(self)
 
         self.attrs = STACKED_SPRITE_ATTRS[name]
         self.y_offset = vec2(0, self.attrs['y_offset'])
