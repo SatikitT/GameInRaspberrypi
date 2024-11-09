@@ -4,7 +4,7 @@ from stacked_sprite import vec2, StackedSprite
 #'57.155.64.75'
 class Server:
     def __init__(self, app):
-        self.hostname = socket.gethostname()
+        self.hostname = '57.155.64.75'
         self.port = 8080
         self.client_socket = None
         self.app = app
