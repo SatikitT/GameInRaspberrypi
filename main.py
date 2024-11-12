@@ -48,6 +48,8 @@ class App:
 
         if self.player.lap >= self.maximum_lap:
             #self.server.send_win_notification()
+            self.server.update_pos(vec2(-1, -1), 0)
+            self.server.load_other_players()
             self.game_state = 'menu'
 
         pg.display.set_caption(f'{self.clock.get_fps(): .1f}')
@@ -56,7 +58,6 @@ class App:
     def draw(self):
         self.screen.fill(BG_COLOR)
         self.main_group.draw(self.screen)
-
         pg.display.flip()
 
     def check_events(self):
@@ -64,6 +65,7 @@ class App:
         self.anim_trigger = False
         for e in pg.event.get():
             if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
+                self.server.update_pos(vec2(-1, -1), 0)
                 self.server.disconnect_from_server()
                 self.game_state = 'menu'
                 
@@ -80,8 +82,9 @@ class App:
                 case 'start':
                     self.check_events()
                     self.get_time()
-                    self.update()
                     self.draw()
+                    self.update()
+                    
                 case _:
                     pg.quit()
                     sys.exit()

@@ -54,7 +54,6 @@ class StackedSprite(pg.sprite.Sprite):
         self.mask = self.collision_masks[self.angle]
         self.rect = self.image.get_rect(center=self.screen_pos + self.y_offset)
 
-
 class TrnspStackedSprite(StackedSprite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

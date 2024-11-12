@@ -14,17 +14,20 @@ connections = []  # List to hold client connections for broadcasting
 # Lock for thread-safe access
 lock = threading.Lock()
 
-def handle_client(conn, player_id):
+def handle_client(conn):
     with conn:
-        player_name = f"player_{player_id[:8]}"  # Unique player name based on UUID
+        # Generate a unique player name based on UUID
+        player_name = f"player_{str(uuid.uuid4())[:8]}"
         print(f"{player_name} connected.")
 
-        # Send the player name to the client
-        conn.sendall(pickle.dumps((player_name, 175 + 100 * len(connections), 750)))
+        # Send the player name and initial position to the client
+        initial_x = 175 + 100 * len(connections)
+        initial_y = 750
+        conn.sendall(pickle.dumps((player_name, initial_x, initial_y)))
 
         with lock:
             # Initialize player with default position and angle
-            players[player_id] = (player_name, 175 + 100 * len(connections), 750, 0)  # (player_name, x, y, angle)
+            players[player_name] = (player_name, initial_x, initial_y, 0)  # (player_name, x, y, angle)
             connections.append(conn)
 
         try:
@@ -35,15 +38,14 @@ def handle_client(conn, player_id):
 
                 try:
                     # Deserialize position update from client
-                    player_data = pickle.loads(data)
-                    _, x, y, angle = player_data  # Ignore the client-sent name
+                    _, x, y, angle = pickle.loads(data)  # Ignore the client-sent name
                 except pickle.PickleError:
                     print(f"Received corrupt data from {player_name}.")
                     break
 
                 # Update the player's position and angle on the server
                 with lock:
-                    players[player_id] = (player_name, x, y, angle)
+                    players[player_name] = (player_name, x, y, angle)
 
                     # Broadcast updated player data to all clients
                     player_data = pickle.dumps(players)
@@ -56,8 +58,8 @@ def handle_client(conn, player_id):
         finally:
             # Clean up on disconnection
             with lock:
-                if player_id in players:
-                    del players[player_id]
+                if player_name in players:
+                    del players[player_name]
                 if conn in connections:
                     connections.remove(conn)
             print(f"{player_name} removed.")
@@ -71,9 +73,8 @@ def start_server():
 
         while True:
             conn, addr = server_socket.accept()
-            player_id = str(uuid.uuid4())  # Unique player ID using UUID
             # Start a new thread for each client
-            threading.Thread(target=handle_client, args=(conn, player_id), daemon=True).start()
+            threading.Thread(target=handle_client, args=(conn,), daemon=True).start()
 
 if __name__ == "__main__":
     start_server()

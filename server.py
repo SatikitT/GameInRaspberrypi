@@ -19,7 +19,6 @@ class Server:
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect((self.hostname, self.port))
             
-            # Receive the assigned player name from the server
             data = self.client_socket.recv(4096)
             print(pickle.loads(data))
             self.player_name, self.app.player.offset.x, self.app.player.offset.y = pickle.loads(data)
@@ -56,6 +55,8 @@ class Server:
                         # Find or create sprite for the player
                         existing_sprite = next((sprite for sprite in self.other_players_sprites if sprite.name == player_name), None)
                         if existing_sprite:
+                            if existing_sprite.pos == vec2(-1,-1):
+                                existing_sprite.kill()
                             existing_sprite.pos = pos
                             existing_sprite.rot = angle * 23
                         else:
@@ -64,9 +65,7 @@ class Server:
                             sprite.name = player_name
                             print(f"create {sprite.name}")
                             self.other_players_sprites.append(sprite)
-
-                #print(f"Updated players: {players_data}")
-
+                            
         except Exception as e:
             print(f"Error receiving other players' data: {e}")
 

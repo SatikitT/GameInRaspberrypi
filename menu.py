@@ -19,7 +19,6 @@ class Menu:
         self.app.screen.blit(img, (x, y))
 
     def run(self):
-
         mouse_pos = pg.mouse.get_pos()
         self.app.screen.fill((0,0,0))
 
