@@ -48,14 +48,17 @@ class Server:
             if data:
                 # Deserialize the data
                 players_data = pickle.loads(data)
-    
+
                 for _, (player_name, x, y, angle) in players_data.items():
                     pos = vec2(x, y)
                     if (player_name != self.player_name):
-                        # Find or create sprite for the player
                         existing_sprite = next((sprite for sprite in self.other_players_sprites if sprite.name == player_name), None)
                         if existing_sprite:
                             if existing_sprite.pos == vec2(-1,-1):
+                                existing_sprite.kill()
+                                self.app.menu.winner = existing_sprite.name + " won"
+                                self.app.game_state = 'menu'
+                            elif existing_sprite.pos == vec2(-2,-2):
                                 existing_sprite.kill()
                             existing_sprite.pos = pos
                             existing_sprite.rot = angle * 23
