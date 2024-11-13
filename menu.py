@@ -8,6 +8,7 @@ class Menu:
         self.font = pg.font.SysFont("arialblack", 40)
         self.color = (255,255,255)
         self.start = False
+        self.winner = ""
 
         self.resume = Button("Start", WIDTH/2, 400)
 
@@ -19,10 +20,10 @@ class Menu:
         self.app.screen.blit(img, (x, y))
 
     def run(self):
-
         mouse_pos = pg.mouse.get_pos()
         self.app.screen.fill((0,0,0))
 
+        self.draw_text(self.winner, WIDTH/2, 100)
         self.draw_text("multiplayer racing game", WIDTH/2, 200)
         self.resume.update(self.app.screen)
 
