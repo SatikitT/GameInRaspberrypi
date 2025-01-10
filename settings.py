@@ -2,7 +2,7 @@ import pygame as pg
 
 vec2 = pg.math.Vector2
 
-RES = WIDTH, HEIGHT = vec2(1600, 900)
+RES = WIDTH, HEIGHT = vec2(800, 600)
 #RES = WIDTH, HEIGHT = vec2(1920, 1080)
 CENTER = H_WIDTH, H_HEIGHT = RES // 2
 TILE_SIZE = 100  #
@@ -10,7 +10,7 @@ TILE_SIZE = 100  #
 PLAYER_SPEED = 1
 PLAYER_ROT_SPEED = 0.002
 
-BG_COLOR = 'olivedrab'  #
+BG_COLOR = 'olivedrab' 
 NUM_ANGLES = 72
 
 ENTITY_SPRITE_ATTRS = {

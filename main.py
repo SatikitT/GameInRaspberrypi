@@ -17,8 +17,8 @@ class App:
         self.maximum_lap = 3
         self.game_state = 'menu'
         
-        self.update_interval = 100  # Update every 1000 ms (1 second)
-        self.last_update_time = pg.time.get_ticks()  # Initialize last update time
+        self.update_interval = 100  # update every 1000 ms
+        self.last_update_time = pg.time.get_ticks()  # initialize last update time
 
         self.main_group = pg.sprite.LayeredUpdates()
         self.collision_group = pg.sprite.Group()

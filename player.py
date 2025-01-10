@@ -63,10 +63,11 @@ class Player(pg.sprite.Sprite):
     def check_collision(self):
         hit = pg.sprite.spritecollide(self, self.app.collision_group,
                                       dokill=False, collided=pg.sprite.collide_mask)
-        if not hit:
+        if not hit or (len(hit) != 0 and "pl" in hit[0].name):
             if self.inc.x or self.inc.y:
                 self.prev_inc = self.inc
         else:
+            print(hit[0].name)
             self.inc = -self.prev_inc
 
         hit = pg.sprite.spritecollide(self, self.app.finishline_group,
