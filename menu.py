@@ -31,7 +31,7 @@ class Menu:
             if event.type == pg.MOUSEBUTTONDOWN:
                 if self.resume.check_for_input(mouse_pos):
                     self.app.game_state = 'start'
-                    self.app.server.connect_to_server()
+                    # self.app.server.connect_to_server()
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 self.app.game_state = ''
 
